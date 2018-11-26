@@ -42,7 +42,7 @@ class FeatureExtract(object):
         staticFeature.append(e)
         staticFeature.append(f)
         staticFeature.append(g)
-        print(staticFeature)
+        #print(staticFeature)
         self.Features.append(staticFeature)
 
     def frequencyDomainFeature(self):
@@ -50,20 +50,20 @@ class FeatureExtract(object):
         sampleRate = self.sampleRate  # 采样率（样本频率）
         fftWindow = np.fft.rfft(window)  # 频谱系数
         Spectrum = list(map((lambda x: np.abs(x)), fftWindow))  # 幅度谱
-        powerSpectrum = list(map((lambda x: x / len(Spectrum)), Spectrum))  # 功率谱
+        powerSpectrum = list(map((lambda x: x / sampleRate), Spectrum))  # 功率谱
 
         SpectrumFeatures = []
-        density = (int)(len(Spectrum) / (0.5 * sampleRate))
+        density = (int)(len(powerSpectrum) / (0.5 * sampleRate))
         # 取频率为0, 0-1, 1-2, 2-3 ... 24-25部分的功率谱，分别计算密度作为特征
-        # SpectrumFeatures.append(Spectrum[0])
+        # SpectrumFeatures.append(powerSpectrum[0])
         for i in range((int)(sampleRate * 0.5)):
             if i == 0:
-                SpectrumFeatures.append(np.mean(Spectrum[1:density]))
+                SpectrumFeatures.append(np.mean(powerSpectrum[1:density]))
             else:
-                SpectrumFeatures.append(np.mean(Spectrum[i * density:(i + 1) * density]))
+                SpectrumFeatures.append(np.mean(powerSpectrum[i * density:(i + 1) * density]))
 
         self.Features.extend(SpectrumFeatures)
-        print(SpectrumFeatures)
+        #print(SpectrumFeatures)
 
 
 def readData(FilePath):
@@ -75,15 +75,23 @@ def readData(FilePath):
             accNorm.append(tmp)
     return accNorm
 
-if __name__ == '__main__':
+def extractFeatures(accNorm,state,featurePath):
     featureExtract = FeatureExtract(512, 100)
+    featureStream = []
+    N = len(accNorm)/512
+    for i in range(N):
+        featureExtract.inputData(accNorm[512 * i:512 * i+1],state)
+        featureExtract.timeDomainFeature()
+        featureExtract.frequencyDomainFeature()
+        featureStream.append(featureExtract.Features)
+    #Save Features
 
-    FilePath = r'traindata/data/'
+
+if __name__ == '__main__':
+
+    FilePath = r'../traindata/data/'
     for root, dirs, fileName in os.walk(FilePath):
         for i in fileName:
             dataDir = os.path.join(root, i)
             accNorm = readData(dataDir)
             print(dataDir)
-            featureExtract.inputData(accNorm[512*13:512*14])
-            featureExtract.timeDomainFeature()
-            featureExtract.frequencyDomainFeature()
