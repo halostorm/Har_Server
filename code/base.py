@@ -9,6 +9,7 @@ import numpy as np
 from handle import Xgb_clf as clf
 
 import command as Cmd
+from handle_nn import NN_clf
 
 
 class base:  # get data form ms_tts_server and translate to the jiajia robot's mouth synthesis message
@@ -68,7 +69,7 @@ class base:  # get data form ms_tts_server and translate to the jiajia robot's m
                 d = self.data.decode('utf-8')
                 print('receive data ok')
                 features = d.split('\t')
-                har = self.inference(features)
+                har = self.inference1(features)
                 self.conn.send(str(har).encode('utf-8'))
             except Exception as e:
                 print('bad line')  # print error message
@@ -82,6 +83,17 @@ class base:  # get data form ms_tts_server and translate to the jiajia robot's m
         har = (int)(res[0])
         print('state: ',har)
         return har
+
+    def inference1(self,features):
+        print(features)
+        inf = NN_clf()
+        print("begin")
+        res = inf.inference(features)
+        print(res)
+        har = (int)(res[0])
+        print('state: ',har)
+        return har
+
 
 
     def close_socket(self, args=None):  # close socket

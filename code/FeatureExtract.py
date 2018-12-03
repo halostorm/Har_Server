@@ -63,5 +63,5 @@ class FeatureExtract(object):
             else:
                 self.Features.append(np.mean(powerSpectrum[i * density:len(powerSpectrum) - 1]))
                 break
-        print(self.Features)
+        # print(self.Features)
         print(np.shape(self.Features))

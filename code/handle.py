@@ -105,7 +105,6 @@ def extractFeatures(accNorm, state, featurePath=r'../traindata.txt'):
 
 
 def generateTrainData(FilePath):
-
     for root, dirs, fileName in os.walk(FilePath):
         for i in fileName:
             state = 0
@@ -117,9 +116,9 @@ def generateTrainData(FilePath):
             elif 'run' in dataDir:
                 state = 3
             elif 'ride' in dataDir:
-                state = 5
+                state = 4
             elif 'car' in dataDir:
-                state = 6
+                state = 5
 
             accNorm = readData(dataDir)
             extractFeatures(accNorm, state)
@@ -128,7 +127,7 @@ def generateTrainData(FilePath):
 
 if __name__ == '__main__':
     FilePath = r'../traindata/data/'
-    # generateTrainData(FilePath)
+    generateTrainData(FilePath)
 
     Xgb_clf = Xgb_clf()
     x_train, y_train = load_svmlight_file(r'../traindata.txt')
@@ -140,7 +139,7 @@ if __name__ == '__main__':
     print(np.shape(y_test))
     print(x_test)
 
-    # Xgb_clf.train(x_train,y_train)
+    Xgb_clf.train(x_train,y_train)
     Xgb_clf.module_load()
     Xgb_clf.test(x_test,y_test)
 
