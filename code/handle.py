@@ -20,11 +20,11 @@ class Xgb_clf:
     def train(self, x_train, y_train):
         # xgb分类器
         parameters = {
-             #'nthread':[1],
+            # 'nthread':[1],
             'objective': ['binary:logistic'],
             # 'learning_rate':[0.05],
             # 'learning_rate':[0.05,0.01,0.005,0.07,0.10],
-            'learning_rate': [0.10,0.20],
+            'learning_rate': [0.10, 0.20],
             'max_depth': [6],
             # 'max_depth':[4,5,6,7,8,9],
             'min_child_weight': [11],
@@ -63,16 +63,17 @@ class Xgb_clf:
         with open(self.model_path, 'rb') as fr:
             self.xgb_model = pickle.load(fr)
 
-    def inference(self,features):
+    def inference(self, features):
         data = []
         for item in features:
             data.append((float)(item))
         input = list(reversed(data))
         # input = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
-        input= np.reshape(input,[1,len(input)])
+        input = np.reshape(input, [1, len(input)])
         print("ok2")
         res = self.xgb_model.predict(input)
         return res
+
 
 def readData(FilePath):
     accNorm = []
@@ -80,14 +81,14 @@ def readData(FilePath):
         i = 0
         for line in f:
             line = line.strip().split('\t')
-            tmp = np.sqrt((float)(line[2]) ** 2 + (float)(line[3]) ** 2 + (float)(line[4]) ** 2) - 9.806
-            if i%2==0:
+            tmp = np.sqrt((float)(line[2]) ** 2 + (float)(line[3]) ** 2 + (float)(line[4]) ** 2) - 9.7938
+            if i % 2 == 0:
                 accNorm.append(tmp)
-            i+=1
+            i += 1
     return accNorm
 
 
-def extractFeatures(accNorm, state, featurePath=r'../traindata.txt'):
+def extractFeatures(accNorm, state, featurePath=r'../traindata_xgb.txt'):
     N = (int)(len(accNorm) / 256)
     featureExtract = Ft.FeatureExtract(256, 50)
     with open(featurePath, 'a+')as fr:
@@ -100,7 +101,7 @@ def extractFeatures(accNorm, state, featurePath=r'../traindata.txt'):
             featureStream = featureExtract.Features
             fr.write(str(state) + ' ')
             for i in range(len(featureStream)):
-                fr.write(str(i+1) + ':' + str(featureStream[i]) + ' ')
+                fr.write(str(i + 1) + ':' + str(featureStream[i]) + ' ')
             fr.write('\n')
 
 
@@ -110,15 +111,15 @@ def generateTrainData(FilePath):
             state = 0
             dataDir = os.path.join(root, i)
             if 'static' in dataDir:
-                state = 1
+                state = 0
             elif 'walk' in dataDir:
-                state = 2
+                state = 1
             elif 'run' in dataDir:
-                state = 3
+                state = 2
             elif 'ride' in dataDir:
-                state = 4
+                state = 3
             elif 'car' in dataDir:
-                state = 5
+                state = 4
 
             accNorm = readData(dataDir)
             extractFeatures(accNorm, state)
@@ -127,10 +128,10 @@ def generateTrainData(FilePath):
 
 if __name__ == '__main__':
     FilePath = r'../traindata/data/'
-    generateTrainData(FilePath)
+    # generateTrainData(FilePath)
 
     Xgb_clf = Xgb_clf()
-    x_train, y_train = load_svmlight_file(r'../traindata.txt')
+    x_train, y_train = load_svmlight_file(r'../traindata_xgb.txt')
     x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, test_size=0.3, random_state=42)
 
     print(np.shape(x_train))
@@ -139,7 +140,6 @@ if __name__ == '__main__':
     print(np.shape(y_test))
     print(x_test)
 
-    Xgb_clf.train(x_train,y_train)
+    Xgb_clf.train(x_train, y_train)
     Xgb_clf.module_load()
-    Xgb_clf.test(x_test,y_test)
-
+    Xgb_clf.test(x_test, y_test)

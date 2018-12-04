@@ -104,7 +104,7 @@ class NN_clf:
         res = self.model.predict(input)
         print(res)
         res = np.argmax(res, axis=1)
-        return res+1
+        return res
 
 
 def extractFeatures(accNorm, state):
@@ -132,7 +132,7 @@ def readData(FilePath):
         i = 0
         for line in f:
             line = line.strip().split('\t')
-            tmp = np.sqrt((float)(line[2]) ** 2 + (float)(line[3]) ** 2 + (float)(line[4]) ** 2) - 9.806
+            tmp = np.sqrt((float)(line[2]) ** 2 + (float)(line[3]) ** 2 + (float)(line[4]) ** 2) - 9.7938
             if i % 2 == 0:
                 accNorm.append(tmp)
             i += 1

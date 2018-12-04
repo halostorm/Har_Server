@@ -68,8 +68,9 @@ class base:  # get data form ms_tts_server and translate to the jiajia robot's m
             try:
                 d = self.data.decode('utf-8')
                 print('receive data ok')
+                print('features: ',d)
                 features = d.split('\t')
-                har = self.inference1(features)
+                har = self.inference(features)
                 self.conn.send(str(har).encode('utf-8'))
             except Exception as e:
                 print('bad line')  # print error message

@@ -55,13 +55,16 @@ class FeatureExtract(object):
         # 取频率为0, 0-1, 1-2, 2-3 ... 24-25部分的功率谱，分别计算密度作为特征
         # self.Features.append(powerSpectrum[0])
         for i in range((int)(sampleRate * 0.5)):
-            print(i)
+            # print(i)
             if i == 0:
                 self.Features.append(np.mean(powerSpectrum[1:density]))
+
             elif i  < 10:
                 self.Features.append(np.mean(powerSpectrum[i * density:(i + 1) * density]))
+
             else:
                 self.Features.append(np.mean(powerSpectrum[i * density:len(powerSpectrum) - 1]))
+
                 break
         # print(self.Features)
-        print(np.shape(self.Features))
+        # print(np.shape(self.Features))
