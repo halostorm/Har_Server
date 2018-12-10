@@ -30,6 +30,7 @@ if __name__ == '__main__':
     iplist = []
     ip = None
     iplist = find_all_ip()
+    print(iplist)
 
     print ('find IPs to use:')
 
