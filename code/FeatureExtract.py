@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.stats as ss
 import os
+import matplotlib.pyplot as plt
 
 
 class FeatureExtract(object):
@@ -8,6 +9,7 @@ class FeatureExtract(object):
     Euler = []
     Quaternion = []
     State = 0
+    id = 0
 
     Features = []
 
@@ -54,6 +56,11 @@ class FeatureExtract(object):
         density = (int)(len(powerSpectrum) / (0.5 * sampleRate))
         # 取频率为0, 0-1, 1-2, 2-3 ... 24-25部分的功率谱，分别计算密度作为特征
         # self.Features.append(powerSpectrum[0])
+        index = []
+        for i in range(len(powerSpectrum)):
+            index.append((i)*(0.5 * sampleRate)/len(powerSpectrum))
+        draw2D_line(index,powerSpectrum,str(self.State)+'_'+str(self.id),'red')
+
         for i in range((int)(sampleRate * 0.5)):
             # print(i)
             if i == 0:
@@ -66,5 +73,44 @@ class FeatureExtract(object):
                 self.Features.append(np.mean(powerSpectrum[i * density:len(powerSpectrum) - 1]))
 
                 break
-        # print(self.Features)
-        # print(np.shape(self.Features))
+
+def draw3D(x,y,z,name,colors):
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z,c = colors)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_ylabel('Z')
+    ax.set_title("3D")
+
+    plt.savefig('./3d/'+ str(name)+'.jpg')
+    plt.show()
+
+
+def draw2D_point(x,y,name,colors):
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_subplot(1,1,1)
+    ax.scatter(x, y,c= colors)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_title("2D")
+
+    plt.savefig('./2d/'+ str(name)+'.jpg')
+    plt.show()
+
+def draw2D_line(x,y,name,colors):
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title("2D")
+    plt.xlabel('f /(Hz)',size=16)
+    plt.ylabel('A',size=16)
+    plt.plot(x,y,c = 'b',label = 'frequency spectrum')
+    my_y_ticks = np.arange(0, 10, 1)
+    plt.yticks(my_y_ticks)
+    my_x_ticks = np.arange(0, 26, 1)
+    plt.tick_params(labelsize=15)
+    plt.legend()
+    plt.xticks(my_x_ticks)
+
+    # plt.savefig('./2d/'+ str(name)+'.jpg')
+    plt.show()

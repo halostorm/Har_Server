@@ -1,11 +1,14 @@
 import random
 
 import keras
+import time
 from keras import Sequential
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping, ModelCheckpoint
 from keras.layers import Dense, BatchNormalization
 from keras.optimizers import Adam
 import numpy as np
+from sklearn import metrics
+
 import FeatureExtract as Ft
 import os
 
@@ -15,8 +18,9 @@ class NN_clf:
     n_classes = 5
 
     def __init__(self):
+        # self.metrics = None
         model = Sequential()
-        model.add(Dense(8, activation='relu', input_dim=17))
+        model.add(Dense(20, activation='relu', input_dim=256))
         model.add(BatchNormalization(axis=1, epsilon=1.1e-5))
         model.add(Dense(5, activation='softmax'))
         optimizer = Adam(lr=1e-2)
@@ -39,7 +43,7 @@ class NN_clf:
         trainY = []
 
         for i in range(len(features)):
-            if i < 0.7 * len(features):
+            if i < 0.8 * len(features):
                 trainX.append(features[i])
                 trainY.append(labels[i])
             else:
@@ -76,15 +80,9 @@ class NN_clf:
 
             callbacks = [lr_reducer, early_stopper, model_checkpoint]
 
-            self.model.fit(trainX, trainY, nb_epoch=nb_epoch,
+            history = self.model.fit(trainX, trainY, nb_epoch=nb_epoch,
                            callbacks=callbacks, batch_size=batch_size,
                            validation_data=(testX, testY), verbose=1)
-
-            # self.model.fit_generator(generator.flow(trainX, trainY, batch_size=batch_size), samples_per_epoch=len(trainX),
-            #                     nb_epoch=nb_epoch,
-            #                     callbacks=callbacks,
-            #                     validation_data=(testX, testY),
-            #                     nb_val_samples=testX.shape[0], verbose=1)
 
     def loadModel(self):
         weights_file = r'har.h5'
@@ -158,9 +156,18 @@ def generateTrainData(FilePath):
                 state = 4
 
             accNorm = readData(dataDir)
+            acc1 = []
+            acc2 = []
+            i = 0
+            for item in accNorm:
+                acc1.append(item)
+                i+=1
+                if i%256 == 0:
+                    acc2.append(acc1)
+                    acc1 = []
             featureX, labelY = extractFeatures(accNorm, state)
 
-            trainX.extend(featureX)
+            trainX.extend(acc2)
             trainY.extend(labelY)
 
             print(str(state) + '\t' + dataDir)
